@@ -1,0 +1,4 @@
+Work - Work test - ssh -o IdentitiesOnly=yes -i ~/.ssh/work root@a.b.c.d
+Freelancer - PJ1: Backend UAT - ssh -o IdentitiesOnly=yes -i ~/.ssh/work root@a.b.c.d
+Work - Work test - ssh -o IdentitiesOnly=yes -i ~/.ssh/work root@a.b.c.d
+Work - Work test - ssh -o IdentitiesOnly=yes -i ~/.ssh/work root@a.b.c.d

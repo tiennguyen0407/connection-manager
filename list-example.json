@@ -1,0 +1,32 @@
+[
+    {
+        "org": "Freelancer",
+        "name": "PJ1: Backend UAT",
+        "tag": "pj1",
+        "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/freelancer root@a.b.c.d"
+    },
+    {
+        "org": "Freelancer",
+        "name": "PJ1: Backend Prod",
+        "tag": "pj1",
+        "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/freelancer root@a.b.c.d"
+    },
+    {
+        "org": "Freelancer",
+        "name": "pj2: Jump server",
+        "tag": "pj2",
+        "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/freelancer root@a.b.c.d"
+    },
+    {
+        "org": "Freelancer",
+        "name": "pj2: Jump server Demo",
+        "tag": "pj2",
+        "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/freelancer root@a.b.c.d"
+    },
+    {
+        "org": "Work",
+        "name": "Work test",
+        "tag": "fg",
+        "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/work root@a.b.c.d"
+    }
+]
