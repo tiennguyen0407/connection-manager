@@ -16,21 +16,37 @@ update_history() {
 
 # Function to prepend recent commands for fzf
 prepend_recent_selections() {
-    echo "Recent - Top 5 commands"
-    tail -n 5 "$HISTORY_FILE" | sort -u | tac | awk '{print NR ": " $0}' | sed 's/$/ - Recent/'
+    if [ -s "$HISTORY_FILE" ]; then
+        echo "Recent - Top 5 commands"
+        cat "$HISTORY_FILE" | sort -u | tail -n 5 | tac | awk '{print NR ": " $0}'
+    fi
 }
 
 # Step 1: Choose organization with preview of its tags
 org_selection=$(prepend_recent_selections; jq -r '.[].org' "$COMMANDS_FILE" | sort -u | awk '{print $0}')
-org=$(echo "$org_selection" | fzf --height=10 --header="Select Organization or Recent" --preview='export org={} && if [[ "$org" =~ "Top 5" ]]; then tail -n 5 '"$HISTORY_FILE"' | sort -u | tac; elif [[ "$org" =~ "Recent" ]]; then echo $org; else jq -r --arg org $org ".[] | select(.org==\$org) | .tag" '"$COMMANDS_FILE"' | sort -u; fi')
+org=$(echo "$org_selection" | fzf --height=10 --header="Select Organization or Recent" --preview='export org={} && if [[ "$org" =~ "Top 5" ]]; then tail -n 5 '"$HISTORY_FILE"' | sort -u | tac; elif [[ "$org" =~ "ssh" ]]; then echo $org; else jq -r --arg org $org ".[] | select(.org==\$org) | .tag" '"$COMMANDS_FILE"' | sort -u; fi')
+
+if [[ "$org" =~ "ssh" ]]; then
+    command=$(echo "$org" | cut -d'|' -f3)
+    echo "Executing command: $command"
+    save_history="${org:3}"
+    update_history "$save_history"
+    eval "$command"
+    exit 0
+fi
 
 [ -z "$org" ] && exit 1
 
 # If "Recent" was selected, skip to executing a recent command
 if [[ "$org" == "Recent - Top 5 commands" ]]; then
-    selected_command=$(tail -n 5 "$HISTORY_FILE" | tac | fzf --header="Select a recent command")
-    if [[ -n "$selected_command" ]]; then
-        eval "$selected_command"
+    selected_command=$(tail -n 5 "$HISTORY_FILE" | tac | fzf --header="Select a recent command" --preview="echo {} | cut -d'|' -f3")
+    command=$(echo "$selected_command" | cut -d'|' -f3)
+
+    update_history "$selected_command"
+
+    if [[ -n "$command" ]]; then
+        echo "Executing command: $command"
+        eval "$command"
         exit 0
     else
         echo "No recent command selected."
@@ -52,7 +68,7 @@ command=$(jq -r --arg org "$org" --arg tag "$tag" --arg name "$name_cmd" '.[] | 
 
 if [[ -n "$command" ]]; then
     echo "Executing command: $command"
-    update_history "$org - $name_cmd - $command"
+    update_history "$org | $name_cmd | $command"
     eval "$command"
 else
     echo "No command selected."
