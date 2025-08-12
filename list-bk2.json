@@ -1,0 +1,132 @@
+[
+  {
+    "org": "COS",
+    "name": "COS: UAT - Frontier",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/cos ubuntu@3.95.222.162"
+  },
+  {
+    "org": "COS",
+    "name": "COS: SonarQube & Nexus",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/cos ec2-user@54.196.231.71"
+  },
+  {
+    "org": "COS",
+    "name": "COS: Colonial | Dev | OpenVPN",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/cos ubuntu@100.24.213.39"
+  },
+  {
+    "org": "COS",
+    "name": "COS: Colonial | Dev | Docker",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/cos ubuntu@54.85.237.72"
+  },
+  {
+    "org": "COS",
+    "name": "COS: Jenkins Server",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/cos ec2-user@54.234.242.2"
+  },
+  {
+    "org": "COS",
+    "name": "COS: Prod Frontier",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/cos ubuntu@52.7.114.231"
+  },
+  {
+    "org": "COS",
+    "name": "COS: Colonial | Dev | MK",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/cos ubuntu@18.209.59.2"
+  },
+  {
+    "org": "COS",
+    "name": "COS: Prod - Utils",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/cos ubuntu@18.206.199.165"
+  },
+  {
+    "org": "COS",
+    "name": "COS: QA - Rails",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/cos ubuntu@3.236.251.209"
+  },
+  {
+    "org": "Margick",
+    "name": "Margick: Jump server",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/vps admin@111.221.44.67 -p 1111"
+  },
+  {
+    "org": "Soldcount",
+    "name": "Soldcount: Master node",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/vps root@154.12.231.113"
+  },
+  {
+    "org": "Soldcount",
+    "name": "Soldcount: MongoDB",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/vps root@194.238.27.114"
+  },
+  {
+    "org": "FG",
+    "name": "OE dev",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/firegroup root@192.168.93.10"
+  },
+  {
+    "org": "FG",
+    "name": "OE stag",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/firegroup root@192.168.90.10"
+  },
+  {
+    "org": "FG",
+    "name": "OE uat",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/firegroup root@192.168.90.9"
+  },
+  {
+    "org": "FG",
+    "name": "OE qc",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/firegroup root@192.168.90.11"
+  },
+  {
+    "org": "FG",
+    "name": "Server OneMobile",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/firegroup root@192.168.93.70"
+  },
+  {
+    "org": "FG",
+    "name": "Main Landing Page",
+    "command": "ssh -i ~/.ssh/main_landing_page root@159.223.76.21"
+  },
+  {
+    "org": "FG",
+    "name": "WordPress Server Local",
+    "command": "ssh -i ~/.ssh/firegroup tiennt@192.168.91.212"
+  },
+  {
+    "org": "FG",
+    "name": "Sh Tracking",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/firegroup tiennt@192.168.93.40"
+  },
+  {
+    "org": "FG",
+    "name": "Runner Macos",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/firegroup tien@192.168.0.35"
+  },
+  {
+    "org": "FG",
+    "name": "Runner Android",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/firegroup tiennt@192.168.93.24"
+  },
+  {
+    "org": "FG",
+    "name": "Server Firesoul Stag",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/firegroup tiennt@192.168.90.38"
+  },
+  {
+    "org": "FG",
+    "name": "Server FGT Stag",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/firegroup tiennt@192.168.90.22"
+  },
+  {
+    "org": "FG",
+    "name": "Test Proxy",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/tiennt.pem ec2-user@3.17.172.78"
+  },
+  {
+    "org": "FG",
+    "name": "MacOS - CP",
+    "command": "ssh -o IdentitiesOnly=yes -i ~/.ssh/firegroup firegroup@192.168.93.19"
+  }
+]

@@ -8,10 +8,47 @@ HISTORY_FILE="/Users/mac/devops/tools/connection-manager/ssh_history.log"
 # Ensure the history file exists
 touch "$HISTORY_FILE"
 
-# Function to append selection to the history file and keep only the last 20 entries
+# Function to append selection to the history file and keep only the newest entry for each name
 update_history() {
-    echo "$1" >> "$HISTORY_FILE"
-    tail -n 20 "$HISTORY_FILE" > "$HISTORY_FILE.tmp" && mv "$HISTORY_FILE.tmp" "$HISTORY_FILE"
+    # Extract name from the input
+    local name=$(echo "$1" | cut -d'|' -f1 | xargs)
+    local entry="$1"
+    
+    # Create a temporary file
+    local temp_file="${HISTORY_FILE}.tmp"
+    > "$temp_file"
+    
+    # Keep track of names we've seen
+    local seen_names=()
+    
+    # Add the new entry first (so it's the newest for this name)
+    echo "$entry" >> "$temp_file"
+    seen_names+=("$name")
+    
+    # Go through existing history and only keep entries with names we haven't seen yet
+    while IFS= read -r line; do
+        local line_name=$(echo "$line" | cut -d'|' -f1 | xargs)
+        
+        # Check if we've already seen this name
+        local skip=false
+        for seen in "${seen_names[@]}"; do
+            if [[ "$seen" == "$line_name" ]]; then
+                skip=true
+                break
+            fi
+        done
+        
+        # If we haven't seen this name, keep the entry and mark as seen
+        if [[ "$skip" == "false" ]]; then
+            echo "$line" >> "$temp_file"
+            seen_names+=("$line_name")
+        fi
+    done < "$HISTORY_FILE"
+    
+    # Replace the original file with our filtered version
+    # Limit to the most recent 20 entries overall
+    tail -n 20 "$temp_file" > "$HISTORY_FILE"
+    rm "$temp_file"
 }
 
 # Function to prepend recent commands for fzf
@@ -23,33 +60,35 @@ prepend_recent_selections() {
     fi
 }
 
-# Step 1: Choose organization with preview of its name
-org_selection=$(prepend_recent_selections; jq -r '.[].org' "$COMMANDS_FILE" | sort -u | awk '{print $0}')
-org=$(echo "$org_selection" | fzf --height=10 --header="Select Organization or Recent" --preview='export org={} && if [[ "$org" =~ "Top 5" ]]; then tail -n 5 '"$HISTORY_FILE"' | sort -u | tac; elif [[ "$org" =~ "ssh" ]]; then echo $org; else jq -r --arg org $org ".[] | select(.org==\$org) | .name" '"$COMMANDS_FILE"' | sort -u; fi')
+# Get all commands with preview
+selection=$(prepend_recent_selections; jq -r '.[] | .name + " | " + .command' "$COMMANDS_FILE" | sort -u | awk '{print $0}')
+selected=$(echo "$selection" | fzf --height=10 --header="Select Connection or Recent" --preview='if [[ "{}" =~ "Top 5" ]]; then tail -n 5 '"$HISTORY_FILE"' | sort -u | tac; elif [[ "{}" =~ "ssh" ]]; then echo {}; fi')
 
-if [[ "$org" =~ "ssh" ]]; then
+if [[ -z "$selected" ]]; then
+    exit 1
+fi
 
-    command=$(echo "$org" | cut -d'|' -f3)
-
+# If a command was selected directly
+if [[ "$selected" =~ " | ssh" ]]; then
+    name=$(echo "$selected" | cut -d'|' -f1 | xargs)
+    command=$(echo "$selected" | cut -d'|' -f2- | xargs)
+    
     echo "Executing command: $command"
-    save_history="${org:3}"
-    update_history "$save_history"
+    update_history "$name | $command"
     eval "$command"
     exit 0
 fi
 
-[ -z "$org" ] && exit 1
-
 # If "Recent" was selected, skip to executing a recent command
-if [[ "$org" == "Recent - Top 5 commands" ]]; then
-    selected_command=$(tail -n 5 "$HISTORY_FILE" | tac | fzf --header="Select a recent command" --preview="echo {} | cut -d'|' -f3")
-    echo "$selected_command"
-    command=$(echo "$selected_command" | cut -d'|' -f3)
-
-    update_history "$selected_command"
-
-    if [[ -n "$command" ]]; then
+if [[ "$selected" == "Recent - Top 5 commands" ]]; then
+    selected_command=$(tail -n 5 "$HISTORY_FILE" | tac | fzf --header="Select a recent command" --preview="echo {} | cut -d'|' -f2-")
+    
+    if [[ -n "$selected_command" ]]; then
+        name=$(echo "$selected_command" | cut -d'|' -f1 | xargs)
+        command=$(echo "$selected_command" | cut -d'|' -f2- | xargs)
+        
         echo "Executing command: $command"
+        update_history "$selected_command"
         eval "$command"
         exit 0
     else
@@ -58,18 +97,6 @@ if [[ "$org" == "Recent - Top 5 commands" ]]; then
     fi
 fi
 
-# Step 2: Choose name based on organization with preview of its commands
-name_cmd=$(jq -r --arg org "$org" '.[] | select(.org==$org) | .name' "$COMMANDS_FILE" | sort -u | fzf --height=10 --header="Select Name" --preview="export name={} && echo \$name | jq -r --arg name \$name '.[] | select(.org==\"$org\" and .name==\$name) | .command' $COMMANDS_FILE")
-[ -z "$name_cmd" ] && exit 1
-
-# Step 4: Find command and execute
-command=$(jq -r --arg org "$org" --arg name "$name_cmd" '.[] | select(.org==$org and .name==$name) | .command' "$COMMANDS_FILE")
-
-if [[ -n "$command" ]]; then
-    echo "Executing command: $command"
-    update_history "$org | $name_cmd | $command"
-    eval "$command"
-else
-    echo "No command selected."
-    exit 1
-fi
+# If we got here, something unexpected happened
+echo "No valid selection made."
+exit 1
